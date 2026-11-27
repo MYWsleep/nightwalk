@@ -4,7 +4,7 @@
 
 - **在线试玩**：https://mywsleep.github.io/nightwalk/play/
 - **官网**：https://mywsleep.github.io/nightwalk/
-- **桌面版**：见 [下载区](https://mywsleep.github.io/nightwalk/#download)（六卷分卷，附 `合并分卷.bat`）
+- **桌面版**：[Nightwalk-1.0.0-win64.zip](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.0/Nightwalk-1.0.0-win64.zip)（110 MB，解压即玩）
 
 ## 内容
 
@@ -27,7 +27,7 @@
 index.html        官网首页
 play/             网页版游戏（与 desktop 同源）
 img/              hero 与章节截图
-download/         桌面版六卷（20MB×5 + 9.8MB）
+（桌面版压缩包放在 GitHub Releases，不进仓库）
 404.html _headers robots.txt .nojekyll DEPLOY.md
 ```
 

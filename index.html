@@ -95,26 +95,17 @@
     <div class='dl' style='margin-top:14px'>
       <div>
         <strong>桌面版 · Windows 10 / 11 · 64 位</strong>
-        <span>Nightwalk-1.0.0-win64.zip &nbsp;·&nbsp; 110 MB（解压后 268 MB）&nbsp;·&nbsp; 免安装</span>
+        <span>Nightwalk-1.0.0-win64.zip &nbsp;·&nbsp; 一个文件 110 MB（解压后 268 MB）&nbsp;·&nbsp; 免安装</span>
       </div>
       <div class='cta'>
-        <a class='btn ghost' href='download/Nightwalk-1.0.0-win64.zip.001' download>第 一 卷</a>
+        <a class='btn solid' href='https://github.com/MYWsleep/nightwalk/releases/download/v1.0.0/Nightwalk-1.0.0-win64.zip' download>下 载 压 缩 包</a>
       </div>
     </div>
-    <p class='sub' style='margin:26px 0 8px'>压缩包按 20 MB 分成了六卷，任何静态托管都能放（单文件上限 25 MB 也吃得下）。六个文件全部下载到同一个文件夹，然后：</p>
-    <ul class='parts'>
-      <li><code>Nightwalk-1.0.0-win64.zip.001</code> <i>20.0 MB</i></li>
-      <li><code>Nightwalk-1.0.0-win64.zip.002</code> <i>20.0 MB</i></li>
-      <li><code>Nightwalk-1.0.0-win64.zip.003</code> <i>20.0 MB</i></li>
-      <li><code>Nightwalk-1.0.0-win64.zip.004</code> <i>20.0 MB</i></li>
-      <li><code>Nightwalk-1.0.0-win64.zip.005</code> <i>20.0 MB</i></li>
-      <li><code>Nightwalk-1.0.0-win64.zip.006</code> <i>9.8 MB</i></li>
-    </ul>
     <ol class='steps'>
-      <li>把六卷放在同一个文件夹里（文件名不要改）。</li>
-      <li>双击同目录的 <code>合并分卷.bat</code>，会拼出 <code>Nightwalk-1.0.0-win64.zip</code>；或者在命令行里执行 <code>copy /b *.zip.00* Nightwalk-1.0.0-win64.zip</code>。</li>
-      <li>解压，得到 <code>Nightwalk-1.0.0-win64</code> 文件夹（不要只拷 exe 出来），双击里面的 <code>启动夜归.bat</code>。</li>
-      <li>直接双击 <code>夜归.exe</code> 可能会一闪就退（部分机器拦 Chromium 沙箱），用 bat 启动即可。</li>
+      <li>下载上面那一个 zip（110 MB），解压到任意目录，得到 <code>Nightwalk-1.0.0-win64</code> 文件夹（别只把 exe 拽出来）。</li>
+      <li>双击里面的 <code>启动夜归.bat</code> 进游戏；想放桌面就右键 <code>夜归.exe</code> 建快捷方式，目标后面补 <code>--no-sandbox</code>。</li>
+      <li>直接双击 <code>夜归.exe</code> 可能一闪就退（个别机器拦 Chromium 沙箱），用 bat 或带参数启动即可。</li>
+      <li>存档在 <code>%APPDATA%\夜归</code>，删掉文件夹就是全新开始。</li>
     </ol>
   </section>
 

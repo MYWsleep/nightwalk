@@ -16,10 +16,10 @@ site/
   .nojekyll             GitHub Pages 用，别删
   img/                  hero.jpg + 6 张章节图（JPEG，合计 ~400 KB）
   play/                 网页版游戏（index.html + src/*.js，~190 KB）
-  download/             桌面版分卷 6 个（20 MB × 5 + 9.8 MB）+ 合并分卷.bat
+
 ```
 
-总体积约 112 MB，其中 110 MB 是分卷压缩包。单文件最大 20 MB，低于 GitHub Pages（100 MB）、Cloudflare Pages（25 MiB）、Vercel（100 MB）的单文件上限，三家都能直接放。
+总体积约 2 MB（桌面版 110 MB 的 zip 放在 GitHub Releases，不进仓库）。
 
 ## 方式一：Cloudflare Pages（推荐，国内外都能开）
 
