@@ -182,7 +182,8 @@
     if (li && out[best] > 0){ li.className = 's best'; li.textContent += ' · 最快'; }
   });
 
-  window.__dl = {run:run, MIRRORS:MIRRORS, TOTAL:TOTAL, NPARTS:NPARTS, setWorkers:function(n){WORKERS=n|0;}};
+  window.__dl = {run:run, MIRRORS:MIRRORS, TOTAL:TOTAL, NPARTS:NPARTS, setWorkers:function(n){WORKERS=n|0;},
+    progress:function(){ var ms=performance.now()-t0; return {bytes:got, ms:Math.round(ms), kbs:Math.round(got/Math.max(1,ms/1000)/1024)}; }};
 })();
 </script>
 </body>
