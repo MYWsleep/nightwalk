@@ -83,7 +83,7 @@
     html += '<li><a href="'+partName(i)+'" style="text-decoration:none">'+partName(i).replace('parts/','')+'</a><i>'+mb(sz)+' MB</i></li>'; }
   elP.innerHTML = html;
 
-  var got=0, t0=0, done=false, raf=0;
+  var got=0, t0=0, done=false, raf=0, WORKERS=16, CHUNK=2097152;
   function paint(){
     var pc = Math.min(100, got/TOTAL*100);
     elFill.style.width = pc.toFixed(1)+'%';
@@ -94,37 +94,45 @@
   }
   function tick(){ if(done) return; paint(); raf=requestAnimationFrame(tick); }
 
-  async function grab(i, on){
-    var r = await fetch(partName(i), {cache:'no-store'});
+  // 分卷 + Range：把整包当成一段连续字节，切 2 MB 一片，任意并发
+  async function grabChunk(start, len, tries){
+    var end = start + len - 1;
+    var pidx = Math.floor(start / PB), lo = start - pidx*PB, hi = Math.min(PB-1, lo + len - 1);
+    var r = await fetch(partName(pidx), {cache:'no-store', headers:{Range:'bytes='+lo+'-'+hi}});
     if (!r.ok) throw new Error('HTTP '+r.status);
-    var rd = r.body.getReader(), chunks=[], n=0;
-    for(;;){ var s = await rd.read(); if (s.done) break; chunks.push(s.value); n += s.value.length; on(s.value.length); }
-    var out = new Uint8Array(n), o=0;
-    for (var k=0;k<chunks.length;k++){ out.set(chunks[k], o); o += chunks[k].length; }
-    return out;
+    if (r.status === 206){ return new Uint8Array(await r.arrayBuffer()); }
+    // 服务器忽略 Range 时返回整卷：切出来
+    var full = new Uint8Array(await r.arrayBuffer());
+    return full.subarray(lo, hi+1);
   }
 
   async function run(opt){
     opt = opt || {};
-    var bufs = new Array(NPARTS), cursor = 0, errs = [];
+    var W = opt.workers || WORKERS, C = opt.chunk || CHUNK;
+    var nChunks = Math.ceil(TOTAL / C);
+    var out = new Uint8Array(TOTAL), cursor = 0, errs = [], fails = {};
     got = 0; t0 = performance.now(); done = false;
     cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     async function worker(){
       for(;;){
-        var i = cursor++; if (i >= NPARTS) return;
-        try { bufs[i] = await grab(i, function(n){ got += n; }); }
-        catch(e){ errs.push(i+':'+e.message); }
+        var i = cursor++; if (i >= nChunks) return;
+        var start = i*C, len = Math.min(C, TOTAL - start);
+        var ok = false;
+        for (var t = 0; t < 2 && !ok; t++){
+          try { var buf = await grabChunk(start, len, t); out.set(buf, start); got += buf.length; ok = true; }
+          catch(e){ if (t === 1) errs.push(i + ':' + e.message); }
+        }
       }
     }
-    await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
+    var ws = []; for (var k = 0; k < W; k++) ws.push(worker());
+    await Promise.all(ws);
     done = true; cancelAnimationFrame(raf); paint();
-    if (errs.length) return {ok:false, errs:errs};
-    var blob = new Blob(bufs, {type:'application/octet-stream'});
-    var ab = await blob.arrayBuffer();
-    var dg = await crypto.subtle.digest('SHA-256', ab);
+    if (errs.length) return {ok:false, errs:errs.slice(0,5), workers:W};
+    var dg = await crypto.subtle.digest('SHA-256', out);
     var hex = Array.prototype.map.call(new Uint8Array(dg), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
-    var res = {ok:true, bytes:blob.size, sha:hex, match:hex===SHA, ms:Math.round(performance.now()-t0)};
+    var res = {ok:true, bytes:out.length, sha:hex, match:hex===SHA, ms:Math.round(performance.now()-t0), workers:W};
     if (opt.save === false) return res;
+    var blob = new Blob([out], {type:'application/octet-stream'});
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'Nightwalk-Setup-1.0.1.exe';
     document.body.appendChild(a); a.click(); a.remove();
@@ -174,7 +182,7 @@
     if (li && out[best] > 0){ li.className = 's best'; li.textContent += ' · 最快'; }
   });
 
-  window.__dl = {run:run, MIRRORS:MIRRORS, TOTAL:TOTAL, NPARTS:NPARTS};
+  window.__dl = {run:run, MIRRORS:MIRRORS, TOTAL:TOTAL, NPARTS:NPARTS, setWorkers:function(n){WORKERS=n|0;}};
 })();
 </script>
 </body>
