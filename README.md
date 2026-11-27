@@ -4,7 +4,8 @@
 
 - **在线试玩**：https://mywsleep.github.io/nightwalk/play/
 - **官网**：https://mywsleep.github.io/nightwalk/
-- **桌面版**：[Nightwalk-1.0.0-win64.zip](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.0/Nightwalk-1.0.0-win64.zip)（110 MB，解压即玩）
+- **桌面版（安装程序）**：[Nightwalk-Setup-1.0.1.exe](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe)（110 MB，双击安装）
+- **桌面版（便携）**：[Nightwalk-1.0.1-win64.zip](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip)（110 MB，解压后跑 启动夜归.bat）
 
 ## 内容
 

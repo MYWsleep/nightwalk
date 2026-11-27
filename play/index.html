@@ -40,22 +40,11 @@
 
   /* ---------- 画面叠加层 ---------- */
   .layer{position:absolute;inset:0;pointer-events:none}
-  #scan{
-    background:repeating-linear-gradient(
-      to bottom,
-      rgba(0,0,0,0) 0px,
-      rgba(0,0,0,0) 3px,
-      rgba(0,0,0,.16) 4px,
-      rgba(0,0,0,0) 5px
-    );
-    mix-blend-mode:multiply;
-    opacity:.20;
-  }
-  #vig{
-    background:radial-gradient(ellipse at 50% 46%,
-      rgba(0,0,0,0) 34%,
-      rgba(0,0,0,.30) 68%,
-      rgba(0,0,0,.86) 100%);
+  /* 扫描线与暗角改由画布自己烘焙（ART.scanlines / ART.vignette）。
+     原来这两层用 mix-blend-mode 做全屏混合，浏览器每帧都要重新合成一遍，
+     实测 239 帧里掉 26 帧；烘焙后 0 帧。DOM 保留但不再显示，减少合成层。 */
+  #scan,#vig{
+    display:none;
   }
   #tint{
     background:transparent;
@@ -335,6 +324,7 @@
         <div class="srow"><span>字 号</span><input id="set-txt" type="range" min="80" max="140" step="5" value="100"><b id="set-txt-v">100%</b></div>
         <div class="srow"><span>减 少 闪 烁</span><button class="tog" id="set-safe">关</button></div>
         <div class="srow"><span>全 屏</span><button class="tog" id="set-full">关</button></div>
+        <div class="srow"><span>帧 率</span><b id="set-fps">-- FPS</b></div>
       </div>
       <div class="sfoot"><button class="btn" data-act="close">返 回</button></div>
       <div class="shint">ESC 也 可 以 返 回</div>

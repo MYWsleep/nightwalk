@@ -1,6 +1,6 @@
 // game.js —— 主循环 / 状态机 / 输入 / 后期处理
 (function (w) {
-  var SCALE = 2;
+  var SCALE = (w.ART && w.ART.SCALE) || 2;   // 和 art.js 的烘焙分辨率保持一致
   var cv = document.getElementById('game');
   var ctx = cv.getContext('2d', { alpha: false });
   var elSub = document.getElementById('sub');
@@ -16,6 +16,7 @@
   var elPauseSub = document.getElementById('pause-sub');
   var elCoverMenu = document.getElementById('cover-menu');
   var elSettings = document.getElementById('settings');
+  var elFps = document.getElementById('set-fps');
 
   // ---------------- 存档（这台机器上的一个槽位） ----------------
   var SAVE_KEY = 'nightwalk.save.v1';
@@ -1032,7 +1033,9 @@
     // 暗角之外的颗粒
     if (G.state !== 'cover') {
       var tz = (rs === 'play' && G.tension) ? G.tension : 0;
-      ART.noise(ctx, G.state === 'scare' ? 0.18 : (0.045 + tz * 0.05));
+      if (!G.lowFX) ART.noise(ctx, G.state === 'scare' ? 0.18 : (0.045 + tz * 0.05));
+      ART.scanlines(ctx, G.lowFX ? 0 : 0.20);
+      ART.vignette(ctx, 1);
       if (tz > 0.35) {
         var vg = ctx.createRadialGradient(W * 0.5, H * 0.5, H * 0.34, W * 0.5, H * 0.5, H * 0.92);
         vg.addColorStop(0, 'rgba(0,0,0,0)');
@@ -1065,15 +1068,40 @@
   }
 
   // ---------------- 主循环 ----------------
+  // 60 帧上限：高刷屏（120/144Hz）不再白跑两倍工作量；acc 累加保证速度不受刷新率影响。
+  // dtEMA 用真实帧间隔（含合成/上屏），连续掉帧就自动降级特效，恢复后再打开。
   var last = performance.now();
+  var acc = 0;
+  var dtEMA = 1 / 60;
+  var slowN = 0, fastN = 0;
+  var fpsShown = 0;
+  G.lowFX = 0;
+
   function loop(now) {
+    requestAnimationFrame(loop);
     var dt = (now - last) / 1000;
     last = now;
-    if (dt > 0.06) dt = 0.06;
     if (dt < 0) dt = 0;
-    update(dt);
+    if (dt > 0.25) dt = 0.25;                  // 切窗口回来不要一次跳太远
+    dtEMA = dtEMA * 0.9 + dt * 0.1;
+    acc += dt;
+    if (acc < 0.0155) return;                  // 上限 60 帧，别空转
+    var step = Math.min(acc, 0.05);
+    acc = 0;
+    update(step);
     render();
-    requestAnimationFrame(loop);
+
+    // 掉帧自适应：连续 20 帧平均帧间隔超 21ms 就关颗粒与扫描线；恢复 90 帧后再打开
+    if (dtEMA > 0.021) { slowN++; fastN = 0; } else if (dtEMA < 0.0185) { fastN++; slowN = 0; }
+    if (slowN > 20 && !G.lowFX) { G.lowFX = 1; slowN = 0; }
+    if (fastN > 90 && G.lowFX) { G.lowFX = 0; fastN = 0; }
+
+    if (G.tickN == null) G.tickN = 0;
+    G.tickN++;
+    if (G.tickN % 15 === 0 && elFps && elSettings && elSettings.classList.contains('on')) {
+      var f = Math.round(1 / Math.max(0.0001, dtEMA));
+      if (f !== fpsShown) { fpsShown = f; elFps.textContent = f + ' FPS'; }
+    }
   }
 
   // 初始画面：让第一章的第一帧先画出来当背景
@@ -1095,6 +1123,7 @@
   w.loadGame = loadGame;
   w.saveGame = saveGame;
   w.openSettings = openSettings;
+  w.fps = function () { return Math.round(1 / Math.max(0.0001, dtEMA)); };
   w.closeSettings = closeSettings;
   w.settingsOpen = settingsOpen;
   w.applySettings = applySettings;

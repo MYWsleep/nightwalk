@@ -29,7 +29,7 @@
     </div>
   </nav>
   <div class='hero-inner'>
-    <p class='kicker'>WINDOWS 10 / 11 · 64 BIT · 1.0.0</p>
+    <p class='kicker'>WINDOWS 10 / 11 · 64 BIT · 1.0.1</p>
     <h1 class='glitch' data-t='夜归'>夜归</h1>
     <p class='en'>N I G H T W A L K</p>
     <p class='lead'>六段回家的路，越走越长。<br>灯会灭，牌子会改字，脚步会多出一双。</p>
@@ -82,7 +82,7 @@
 
   <section class='sec reveal' id='download'>
     <h2>下载</h2>
-    <p class='sub'>不想装东西就<a href='play/'>直接在线玩</a>，存档在浏览器里。要独立程序、离线跑、不依赖浏览器，就下桌面版：Electron 打包，不装环境、不联网、不写注册表（除了自己的存档目录）。</p>
+    <p class='sub'>不想装东西就<a href='play/'>直接在线玩</a>，存档在浏览器里。要独立程序、离线跑、不依赖浏览器，就下桌面版：Electron 打包，不装环境、不联网；安装程序只写自己的目录、快捷方式和一条卸载项。</p>
     <div class='dl'>
       <div>
         <strong>在线版 · 浏览器直接玩</strong>
@@ -95,23 +95,24 @@
     <div class='dl' style='margin-top:14px'>
       <div>
         <strong>桌面版 · Windows 10 / 11 · 64 位</strong>
-        <span>Nightwalk-1.0.0-win64.zip &nbsp;·&nbsp; 一个文件 110 MB（解压后 268 MB）&nbsp;·&nbsp; 免安装</span>
+        <span>Nightwalk-Setup-1.0.1.exe &nbsp;·&nbsp; 110 MB 安装程序（装好 268 MB）&nbsp;·&nbsp; 自动建快捷方式、带卸载项</span>
       </div>
       <div class='cta'>
-        <a class='btn solid' href='https://github.com/MYWsleep/nightwalk/releases/download/v1.0.0/Nightwalk-1.0.0-win64.zip' download>下 载 压 缩 包</a>
+        <a class='btn solid' href='https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe' download>下 载 安 装 程 序</a>
       </div>
     </div>
+    <p class='sub'>不想装也行：下<a href='https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip'>便携版 zip</a>，解压后双击 <code>启动夜归.bat</code>。</p>
     <ol class='steps'>
-      <li>下载上面那一个 zip（110 MB），解压到任意目录，得到 <code>Nightwalk-1.0.0-win64</code> 文件夹（别只把 exe 拽出来）。</li>
-      <li>双击里面的 <code>启动夜归.bat</code> 进游戏；想放桌面就右键 <code>夜归.exe</code> 建快捷方式，目标后面补 <code>--no-sandbox</code>。</li>
-      <li>直接双击 <code>夜归.exe</code> 可能一闪就退（个别机器拦 Chromium 沙箱），用 bat 或带参数启动即可。</li>
-      <li>存档在 <code>%APPDATA%\夜归</code>，删掉文件夹就是全新开始。</li>
+      <li>下载 <code>Nightwalk-Setup-1.0.1.exe</code>（110 MB），双击，点「开始安装」，十几秒装完。装在 <code>%LOCALAPPDATA%\Programs\Nightwalk</code>。</li>
+      <li>装完桌面和开始菜单都有「夜归」（快捷方式自带 <code>--no-sandbox</code>）；也可以点安装程序里的「立即启动」。</li>
+      <li>卸载：Windows 设置 → 应用 → 夜归 → 卸载，或运行安装目录里的 <code>卸载夜归.exe</code>。</li>
+      <li>存档在 <code>%APPDATA%\夜归</code>，删掉文件夹就是全新开始（卸载不会删它）。</li>
     </ol>
   </section>
 
   <section class='sec reveal' id='faq'>
     <h2>常见问题</h2>
-    <details><summary>双击 夜归.exe 窗口一闪就没了</summary><p>这台机器拦了 Chromium 的沙箱进程。用同目录的 <code>启动夜归.bat</code> 启动，它会带上 <code>--no-sandbox</code>。游戏只加载本地文件，不访问网络。</p></details>
+    <details><summary>双击 夜归.exe 窗口一闪就没了</summary><p>个别机器会拦 Chromium 的沙箱进程。用安装程序装的，桌面快捷方式已经带上 <code>--no-sandbox</code>，直接双击就行；便携版请用同目录的 <code>启动夜归.bat</code>。游戏只加载本地文件，不访问网络。</p></details>
     <details><summary>存档在哪里</summary><p><code>%APPDATA%\夜归</code>。设置和进度都在里面，删掉等于重来。主界面「重新开始」也会清档。</p></details>
     <details><summary>为什么一开始没有声音</summary><p>浏览器和 Electron 都要求先有一次点击才允许播放音频。点一下画面就好；音量在 ESC → 设置里调。</p></details>
     <details><summary>主界面写着「不是你的」</summary><p>那是存档污染机制，不是错误。走远一点（超过 600 像素）再回主界面，它就会变回你自己的进度。</p></details>
@@ -127,7 +128,7 @@
 </main>
 
 <footer class='wrap'>
-  <span>夜归 · NIGHTWALK · 1.0.0</span>
+  <span>夜归 · NIGHTWALK · 1.0.1</span>
   <span>CANVAS 2D + WEBAUDIO · 无引擎 · 无素材 · 零依赖 &nbsp;·&nbsp; <a href='play/'>在线版</a></span>
 </footer>
 

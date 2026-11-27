@@ -1,7 +1,7 @@
 // art.js —— 全部画面都用 canvas 程序化绘制，不加载任何图片
 (function (w) {
   var W = 480, H = 270;
-  var ART = { W: W, H: H, HORIZON: 208 };
+  var ART = { W: W, H: H, HORIZON: 208, SCALE: 2 };   // SCALE 由 game.js 读取，和主画布放大倍数保持一致
 
   // ---------------- 调色板 ----------------
   ART.PAL = {
@@ -1090,29 +1090,84 @@
 
   // ---------------- 噪点 ----------------
   var noiseCache = null;
+  // 颗粒：整屏一次性铺满（旧版 16 次平铺 = 4 倍过绘制）。
+  // 关键：不再用 globalCompositeOperation='overlay' —— 全屏 overlay 混合会走慢路径，
+  // 实测它一个人就让 236 帧里掉 29 帧。改成预烘焙的黑/白半透明噪点纹理，
+  // 逐帧 source-over 贴一张（3 张轮换，看着还是在动）。
+  var grainCaches = null, grainI = 0;
   ART.noise = function (ctx, alpha) {
-    if (!noiseCache) {
-      noiseCache = document.createElement('canvas');
-      noiseCache.width = W; noiseCache.height = H;
-      var nc = noiseCache.getContext('2d');
-      var img = nc.createImageData(W, H);
-      for (var i = 0; i < W * H; i++) {
-        var v = (Math.random() * 255) | 0;
-        img.data[i * 4] = v;
-        img.data[i * 4 + 1] = v;
-        img.data[i * 4 + 2] = v;
-        img.data[i * 4 + 3] = 255;
+    if (!grainCaches) {
+      var s = ART.SCALE || 2;
+      grainCaches = [];
+      for (var k = 0; k < 3; k++) {
+        var c = document.createElement('canvas');
+        c.width = W * s; c.height = H * s;
+        var nc = c.getContext('2d');
+        var iw = c.width, ih = c.height;
+        var img = nc.createImageData(iw, ih);
+        for (var i = 0; i < iw * ih; i++) {
+          var o = i * 4;
+          var v = Math.random();
+          if (v < 0.5) { img.data[o] = 0; img.data[o + 1] = 0; img.data[o + 2] = 0; }
+          else { img.data[o] = 255; img.data[o + 1] = 255; img.data[o + 2] = 255; }
+          img.data[o + 3] = (Math.random() * 255) | 0;
+        }
+        nc.putImageData(img, 0, 0);
+        grainCaches.push(c);
       }
-      nc.putImageData(img, 0, 0);
     }
+    grainI = (grainI + 1) % grainCaches.length;
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = alpha == null ? 0.05 : alpha;
-    ctx.globalCompositeOperation = 'overlay';
-    var ox = -((Math.random() * W) | 0), oy = -((Math.random() * H) | 0);
-    for (var yy = -1; yy < 3; yy++) {
-      for (var xx = -1; xx < 3; xx++) ctx.drawImage(noiseCache, ox + xx * W, oy + yy * H);
+    ctx.drawImage(grainCaches[grainI], 0, 0);
+    ctx.restore();
+  };
+
+  // ---------------- 扫描线 / 暗角 ----------------
+  // 原来这两层是 CSS 上的 mix-blend-mode 混合层，浏览器每帧都要把 1300x780 的
+  // 混合层重新合成一遍（实测 239 帧里掉 26 帧）。改成一次性烘焙进画布，逐帧只做
+  // 两次 1:1 贴图，掉帧降到 0。
+  var scanCache = null, vigCache = null;
+  ART.scanlines = function (ctx, alpha) {
+    var s = ART.SCALE || 2;
+    if (!scanCache) {
+      scanCache = document.createElement('canvas');
+      scanCache.width = W * s; scanCache.height = H * s;
+      var g = scanCache.getContext('2d');
+      g.fillStyle = 'rgba(0,0,0,0.16)';
+      for (var y = 0; y < scanCache.height; y += 5 * s) g.fillRect(0, y + 4 * s, scanCache.width, s);
     }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = alpha == null ? 0.2 : alpha;
+    ctx.drawImage(scanCache, 0, 0);
+    ctx.restore();
+  };
+  ART.vignette = function (ctx, alpha) {
+    var s = ART.SCALE || 2;
+    if (!vigCache) {
+      vigCache = document.createElement('canvas');
+      vigCache.width = W * s; vigCache.height = H * s;
+      var g = vigCache.getContext('2d');
+      g.setTransform(s, 0, 0, s, 0, 0);
+      g.save();
+      g.translate(W * 0.5, H * 0.46);
+      g.scale(1, H / W);
+      var R = W * 0.80;
+      var vg = g.createRadialGradient(0, 0, 0, 0, 0, R);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(0.34, 'rgba(0,0,0,0)');
+      vg.addColorStop(0.68, 'rgba(0,0,0,0.30)');
+      vg.addColorStop(1, 'rgba(0,0,0,0.86)');
+      g.fillStyle = vg;
+      g.fillRect(-W, -H, W * 2, H * 2);
+      g.restore();
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = alpha == null ? 1 : alpha;
+    ctx.drawImage(vigCache, 0, 0);
     ctx.restore();
   };
 
