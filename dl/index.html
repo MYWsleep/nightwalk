@@ -47,7 +47,11 @@
   <p class="lead">安装程序被切成 12 卷放在这台站点的 CDN 上，浏览器并行拉取后自动拼回完整的 <code>Nightwalk-Setup-1.0.1.exe</code>。不经过 GitHub，不用手动合并。</p>
 
   <div class="box2" style="margin-top:36px">
-    <button class="btn solid big" id="go">开 始 高 速 下 载</button>
+    <button class="btn solid big" id="go">开 始 高 速 下 载（本站分卷）</button>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn ghost" id="go-mirror" style="flex:1;justify-content:center">走 镜 像 通 道（gh-proxy）</button>
+      <button class="btn ghost" id="bench2" style="justify-content:center">先 测 速</button>
+    </div>
     <div class="bar"><i id="fill"></i></div>
     <div class="stat"><span id="l">共 12 卷 · 110.0 MB</span><span id="r">等待开始</span></div>
     <div class="hash">SHA256 <em>e14ffc79570b21553cb0e4417fbd6808936b5952e70993fc3697f72ac0cd9ead</em></div>
@@ -76,6 +80,12 @@
   var elGo=document.getElementById('go'), elFill=document.getElementById('fill'),
       elL=document.getElementById('l'), elR=document.getElementById('r'), elP=document.getElementById('plist');
   function partName(i){ return 'parts/nw-setup.part' + ('0'+i).slice(-2); }
+  var MIRRORS = {
+    direct: 'https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
+    ghfast: 'https://ghfast.top/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
+    ghproxy: 'https://gh-proxy.com/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
+    zip: 'https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip'
+  };
   function mb(b){ return (b/1048576).toFixed(1); }
   // 分卷列表
   var html='';
@@ -95,12 +105,10 @@
   function tick(){ if(done) return; paint(); raf=requestAnimationFrame(tick); }
 
   // 分卷 + Range：把整包当成一段连续字节，切 2 MB 一片，任意并发
-  async function grabChunk(start, len, onBytes){
-    var end = start + len - 1;
-    var pidx = Math.floor(start / PB), lo = start - pidx*PB, hi = Math.min(PB-1, lo + len - 1);
-    var r = await fetch(partName(pidx), {cache:'no-store', headers:{Range:'bytes='+lo+'-'+hi}});
+  async function grabAbs(url, lo, hi, onBytes){
+    var r = await fetch(url, {cache:'no-store', headers:{Range:'bytes='+lo+'-'+hi}});
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    if (!r.body || r.status !== 206){                 // 服务器忽略 Range：返回整卷后切片
+    if (!r.body || r.status !== 206){
       var full = new Uint8Array(await r.arrayBuffer());
       var sl = (r.status === 206) ? full : full.subarray(lo, hi+1);
       onBytes(sl.length); return sl;
@@ -110,6 +118,15 @@
     var out = new Uint8Array(n), o = 0;
     for (var k = 0; k < parts.length; k++){ out.set(parts[k], o); o += parts[k].length; }
     return out;
+  }
+  // 本站分卷（Pages CDN）
+  function grabChunk(start, len, onBytes){
+    var pidx = Math.floor(start / PB), lo = start - pidx*PB, hi = Math.min(PB-1, lo + len - 1);
+    return grabAbs(partName(pidx), lo, hi, onBytes);
+  }
+  // 镜像直取整个安装包（gh-proxy，带 CORS + Range），绝对字节区间
+  function grabMirror(start, len, onBytes){
+    return grabAbs(MIRRORS.ghproxy, start, start + len - 1, onBytes);
   }
 
   function plan(C){                                  // 每片都不能跨卷（跨卷会被 Range 截断）
@@ -123,7 +140,7 @@
 
   async function run(opt){
     opt = opt || {};
-    var W = opt.workers || WORKERS, C = opt.chunk || CHUNK;
+    var W = opt.workers || WORKERS, C = opt.chunk || CHUNK, grab = (opt.src === 'ghproxy') ? grabMirror : grabChunk;
     var todo = plan(C), nChunks = todo.length;
     var out = new Uint8Array(TOTAL), cursor = 0, errs = [];
     got = 0; t0 = performance.now(); done = false;
@@ -135,7 +152,7 @@
         for (var t = 0; t < 2 && !ok; t++){
           var mine = 0;
           try {
-            var buf = await grabChunk(start, len, function(n){ mine += n; got += n; });
+            var buf = await grab(start, len, function(n){ mine += n; got += n; });
             if (buf.length !== len) throw new Error('short ' + buf.length + '/' + len);
             out.set(buf, start); ok = true;
           } catch(e){ got -= mine; if (t === 1) errs.push(i + ':' + e.message); }
@@ -158,23 +175,22 @@
     return res;
   }
 
-  elGo.addEventListener('click', async function(){
-    elGo.disabled = true; elGo.textContent = '正 在 下 载 …'; elR.textContent = '准备中';
-    try {
-      var r = await run({save:true});
-      if (!r.ok){ elR.textContent = '有分卷失败，请用备用通道'; elGo.textContent = '重 试'; }
-      else { elR.textContent = r.ms/1000 + ' 秒 · ' + (r.bytes/1048576/ (r.ms/1000)).toFixed(1) + ' MB/s · 校验' + (r.match?'通过':'不符'); elGo.textContent = '已 保 存'; }
-    } catch(e){ elR.textContent = '失败：' + e.message; elGo.textContent = '重 试'; }
-    elGo.disabled = false;
-  });
-
+  function makeHandler(btn, src, label){
+    btn.addEventListener('click', async function(){
+      btn.disabled = true; elGo.disabled = true;
+      btn.textContent = '正 在 下 载 …'; elR.textContent = '准备中';
+      try {
+        var r = await run({save:true, src:src, workers: src === 'ghproxy' ? 12 : 16});
+        if (!r.ok){ elR.textContent = '部分分片失败，换另一条通道试'; btn.textContent = label + '（重 试）'; }
+        else { elR.textContent = r.ms/1000 + ' 秒 · ' + (r.bytes/1048576/(r.ms/1000)).toFixed(2) + ' MB/s · SHA256 ' + (r.match?'通过':'不符'); btn.textContent = '已 保 存'; }
+      } catch(e){ elR.textContent = '失败：' + e.message; btn.textContent = label + '（重 试）'; }
+      btn.disabled = false; elGo.disabled = false;
+    });
+  }
+  makeHandler(elGo, 'pages', '开 始 高 速 下 载（本站分卷）');
+  makeHandler(document.getElementById('go-mirror'), 'ghproxy', '走 镜 像 通 道（gh-proxy）');
+  document.getElementById('bench2').addEventListener('click', function(){ document.getElementById('bench').click(); });
   // 镜像测速：1 MB range
-  var MIRRORS = {
-    direct: 'https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
-    ghfast: 'https://ghfast.top/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
-    ghproxy: 'https://gh-proxy.com/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
-    zip: 'https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip'
-  };
   async function bench(k){
     var li = document.querySelector('#mlist li[data-k="'+k+'"] .s');
     li.textContent = '测试中'; li.className = 's';
@@ -185,7 +201,7 @@
       clearTimeout(tm);
       if (!r.body){ li.textContent = '不支持流式'; return 0; }
       var rd = r.body.getReader();
-      for(;;){ var s = await rd.read(); if (s.done) break; bytes += s.value.length; }
+      for(;;){ var st = await rd.read(); if (st.done) break; bytes += st.value.length; }
     } catch(e){ li.textContent = '不通'; return 0; }
     var sec = (performance.now()-t)/1000, sp = bytes/sec;
     var txt = sp>1048576 ? (sp/1048576).toFixed(1)+' MB/s' : (sp/1024).toFixed(0)+' KB/s';
@@ -200,8 +216,11 @@
     if (li && out[best] > 0){ li.className = 's best'; li.textContent += ' · 最快'; }
   });
 
-  window.__dl = {run:run, MIRRORS:MIRRORS, TOTAL:TOTAL, NPARTS:NPARTS, setWorkers:function(n){WORKERS=n|0;},
-    progress:function(){ var ms=performance.now()-t0; return {bytes:got, ms:Math.round(ms), kbs:Math.round(got/Math.max(1,ms/1000)/1024)}; }};
+  window.__dl = {
+    run: run, MIRRORS: MIRRORS, TOTAL: TOTAL, NPARTS: NPARTS,
+    setWorkers: function(n){ WORKERS = n|0; },
+    progress: function(){ var ms = performance.now()-t0; return {bytes: got, ms: Math.round(ms), kbs: Math.round(got/Math.max(1,ms/1000)/1024)}; }
+  };
 })();
 </script>
 </body>
