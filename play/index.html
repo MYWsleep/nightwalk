@@ -2,7 +2,13 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#05070a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>夜归 · Nightwalk</title>
 <style>
   :root{
@@ -296,6 +302,42 @@
     75%{opacity:.3;background:#7a0d0d;transform:translate(2px,1px)}
     100%{opacity:0;transform:translate(0,0)}
   }
+
+  /* ---------- 移动端（触控） ---------- */
+  html,body{touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+  #stage{ /* 刘海屏安全区：只影响叠加层，不影响画面 */ }
+  #touch{position:absolute;inset:0;pointer-events:none;z-index:14;display:none}
+  body.touch #touch{display:block}
+  #touch .tbtn{
+    position:absolute;pointer-events:auto;
+    display:flex;align-items:center;justify-content:center;
+    color:#a7b3c1;letter-spacing:.32em;text-indent:.32em;
+    background:rgba(7,11,17,.34);
+    border:1px solid rgba(150,170,190,.20);
+    backdrop-filter:blur(2px);
+    font-size:calc(clamp(11px,1.15vw,16px) * var(--txt, 1));
+    transition:background .1s linear,color .1s linear,border-color .1s linear,transform .1s linear;
+    user-select:none;-webkit-user-select:none;
+  }
+  #touch .tbtn.hit{
+    background:rgba(140,26,26,.26);border-color:rgba(206,86,86,.46);color:#f1dada;transform:scale(.97);
+  }
+  #walk{left:3.4%;bottom:11%;width:17%;height:30%;border-radius:50%}
+  #look{right:3.4%;bottom:11%;width:17%;height:30%;border-radius:50%}
+  #tpause{
+    right:max(2.2%, env(safe-area-inset-right));top:max(3.4%, env(safe-area-inset-top));
+    width:8.4%;height:8.6%;border-radius:2px;font-size:calc(clamp(11px,1.15vw,16px) * var(--txt,1));letter-spacing:0;text-indent:0;
+  }
+  body:not(.touch) #tpause{display:none}
+  #mtip{
+    position:absolute;left:50%;bottom:6%;transform:translateX(-50%);
+    padding:.5em 1.1em;background:rgba(4,7,11,.72);border:1px solid rgba(150,170,190,.18);
+    color:#93a1b0;font-size:calc(clamp(10px,.9vw,13px) * var(--txt,1));letter-spacing:.22em;
+    opacity:0;transition:opacity .5s ease;pointer-events:none;white-space:nowrap;
+  }
+  #mtip.on{opacity:1}
+  body.touch #sub{bottom:13%}
+  body.touch #card .cn, body.touch #cover .menu .btn{font-size:calc(clamp(18px,2.6vw,34px) * var(--txt,1))}
 </style>
 </head>
 <body>
@@ -354,7 +396,21 @@
   <script src="src/util.js"></script>
   <script src="src/audio.js"></script>
   <script src="src/art.js"></script>
+<script>
+  // 触屏设备（手机/平板）把内部渲染倍率提到 3x，1080p 手机上更清楚
+  (function () {
+    var coarse = navigator.maxTouchPoints > 0 || ('ontouchstart' in window);
+    if (coarse && window.ART) ART.SCALE = Math.max(2, Math.min(3, Math.ceil((window.devicePixelRatio || 1) * 1.5)));
+  })();
+</script>
   <script src="src/chapters.js"></script>
   <script src="src/game.js"></script>
+  <script src="src/touch.js"></script>
+  <script>
+    // PWA：装到手机主屏后可离线玩（file:// 与 WebView 里不注册）
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && location.hostname !== 'appassets.androidplatform.net') {
+      addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    }
+  </script>
 </body>
 </html>

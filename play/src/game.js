@@ -2,6 +2,9 @@
 (function (w) {
   var SCALE = (w.ART && w.ART.SCALE) || 2;   // 和 art.js 的烘焙分辨率保持一致
   var cv = document.getElementById('game');
+  // 画布后备分辨率跟随渲染倍率（手机 3x，桌面 2x）——之前固定 960x540，切 3x 会被裁切
+  cv.width = (w.ART.W || 480) * SCALE;
+  cv.height = (w.ART.H || 270) * SCALE;
   var ctx = cv.getContext('2d', { alpha: false });
   var elSub = document.getElementById('sub');
   var elCard = document.getElementById('card');
@@ -1144,5 +1147,21 @@
     elCover.classList.add('hide');
     elCover.style.display = 'none';
     enterChapter(n || 0);
+  };
+  // ---------------- 移动端 / 外部接口 ----------------
+  w.NW = {
+    G: G,
+    state: function () { return G.state; },
+    startGame: startGame,
+    startLook: startLook,
+    openPause: openPause,
+    closePause: closePause,
+    settingsOpen: settingsOpen,
+    showCover: showCover,
+    setMoving: function (v) {
+      if (G.state === 'play' || G.state === 'card') G.moving = !!v;
+      else if (!v) G.moving = false;
+    },
+    look: function (v) { if (v) startLook(); else G.looking = false; }
   };
 })(window);
