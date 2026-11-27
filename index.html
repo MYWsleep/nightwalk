@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+<meta charset='utf-8'>
+<script>document.documentElement.classList.add('js')</script>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>夜归 · Nightwalk</title>
+<meta name='description' content='夜归 Nightwalk —— 六段回家的路。灯会灭，牌子会改字，脚步会多出一双。'>
+<meta name='theme-color' content='#06070a'>
+<meta property='og:title' content='夜归 · Nightwalk'>
+<meta property='og:description' content='六段回家的路。灯会灭，牌子会改字，脚步会多出一双。'>
+<meta property='og:image' content='img/hero.jpg'>
+<meta property='og:type' content='website'>
+<link rel='icon' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090a0c'/%3E%3Ccircle cx='16' cy='14' r='7' fill='%23c9c1b4'/%3E%3Ccircle cx='13' cy='13' r='2' fill='%23120f0d'/%3E%3Ccircle cx='19' cy='13' r='2' fill='%23120f0d'/%3E%3Cpath d='M12 19h8' stroke='%238e1f1a' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel='stylesheet' href='style.css'>
+</head>
+<body>
+
+<header class='hero'>
+  <div class='hero-bg' style="background-image:url('img/hero.jpg')"></div>
+  <nav class='topnav'>
+    <a class='brand' href='./'>夜 归</a>
+    <div class='navlinks'>
+      <a href='#chapters'>章节</a>
+      <a href='#how'>机制</a>
+      <a href='play/'>在线试玩</a>
+      <a href='#download'>下载</a>
+      <a href='#faq'>FAQ</a>
+    </div>
+  </nav>
+  <div class='hero-inner'>
+    <p class='kicker'>WINDOWS 10 / 11 · 64 BIT · 1.0.0</p>
+    <h1 class='glitch' data-t='夜归'>夜归</h1>
+    <p class='en'>N I G H T W A L K</p>
+    <p class='lead'>六段回家的路，越走越长。<br>灯会灭，牌子会改字，脚步会多出一双。</p>
+    <div class='cta'>
+      <a class='btn solid' href='play/'>在 线 试 玩</a>
+      <a class='btn ghost' href='#download'>下 载 桌 面 版</a>
+      <a class='btn ghost' href='#how'>怎 么 玩</a>
+    </div>
+  </div>
+  <div class='scroll'>往 下 走</div>
+</header>
+
+<main class='wrap'>
+
+  <section class='sec reveal' id='about'>
+    <h2>这是一款走路游戏</h2>
+    <p class='sub'>没有战斗，没有背包，没有可以打的东西。你只是下班，穿过四条街、一个车库、五层楼，回到自己家门口。<br>问题在于，这一路会记住你走了多少步，回了多少次头。</p>
+    <div class='stats'>
+      <div><b>06</b><span>段 路</span></div>
+      <div><b>25</b><span>分 钟</span></div>
+      <div><b>0</b><span>次 战 斗</span></div>
+      <div><b>1</b><span>个 跟 着 你 的 东 西</span></div>
+    </div>
+  </section>
+
+  <section class='sec reveal' id='chapters'>
+    <h2>六段路</h2>
+    <p class='sub'>每一段都以一次惊吓结束。之后你会拿到一张章节卡——上面的字，不一定还是原来那几个。</p>
+    <div class='grid'>
+      <article class='card'><img src='img/street.jpg' alt='街道'><div class='meta'><span class='no'>CH.01</span><h3>下班</h3><p>十点关门的街，招牌已经开始改字。</p></div></article>
+      <article class='card'><img src='img/store.jpg' alt='便利店'><div class='meta'><span class='no'>CH.02</span><h3>便利店</h3><p>冷柜的灯太亮，亮到能照见货架后面。</p></div></article>
+      <article class='card'><img src='img/garage.jpg' alt='车库'><div class='meta'><span class='no'>CH.03</span><h3>车 库</h3><p>B 区不存在车位的编号。出口的箭头指向自己。</p></div></article>
+      <article class='card'><img src='img/stairs.jpg' alt='楼道'><div class='meta'><span class='no'>CH.04</span><h3>楼 道</h3><p>五楼的牌子写着五楼。上一层还是五楼。</p></div></article>
+      <article class='card noimg'><span class='ghost-no'>602</span><div class='meta'><span class='no'>CH.05</span><h3>到家</h3><p>门牌在你回头的时候会变。钥匙只有一把。</p></div></article>
+      <article class='card'><img src='img/living.jpg' alt='客厅'><div class='meta'><span class='no'>CH.06</span><h3>客 厅</h3><p>电视在放雪花，沙发上坐着背对你的人。</p></div></article>
+    </div>
+  </section>
+
+  <section class='sec reveal' id='how'>
+    <h2>它记得你</h2>
+    <p class='sub'>按下 ↓ 可以回头看。这是本作唯一一个「技能」，也是唯一一个陷阱。</p>
+    <div class='cols'>
+      <div class='box'><span class='tag'>LOOK BACK</span><h3>回头</h3><p>回头看能确认它在哪，但它也会因此靠近一点。回得越频繁，距离越短；贴到背上，你会被拽回去一段路。</p></div>
+      <div class='box'><span class='tag'>MEMORY</span><h3>记忆污染</h3><p>看见它的次数会累积成「记忆」。记忆越高，路牌上的字越不对：和平路会变成和平路无人，限高 2.1m 会变成 1.6m。</p></div>
+      <div class='box'><span class='tag'>SAVE</span><h3>存档</h3><p>每章自动存在本机。偶尔，主界面会出现一个不属于你的进度——「继续第 3 章 · 不是你的」。那不是 bug。</p></div>
+      <div class='box'><span class='tag'>SUBTITLE</span><h3>字幕</h3><p>它离得越近，字幕越结巴，字会重复、会叠出回声。到后来，连主界面的标题都开始重复。</p></div>
+    </div>
+    <p class='keys'><b>← →</b> 走 &nbsp;·&nbsp; <b>↑</b> 快走 &nbsp;·&nbsp; <b>↓</b> 回头看 &nbsp;·&nbsp; <b>ESC</b> 暂停 / 设置 &nbsp;·&nbsp; <b>F11</b> 全屏</p>
+  </section>
+
+  <section class='sec reveal' id='download'>
+    <h2>下载</h2>
+    <p class='sub'>不想装东西就<a href='play/'>直接在线玩</a>，存档在浏览器里。要独立程序、离线跑、不依赖浏览器，就下桌面版：Electron 打包，不装环境、不联网、不写注册表（除了自己的存档目录）。</p>
+    <div class='dl'>
+      <div>
+        <strong>在线版 · 浏览器直接玩</strong>
+        <span>无需安装 &nbsp;·&nbsp; 存档在 localStorage &nbsp;·&nbsp; 键盘操作</span>
+      </div>
+      <div class='cta'>
+        <a class='btn solid' href='play/'>开 始 游 戏</a>
+      </div>
+    </div>
+    <div class='dl' style='margin-top:14px'>
+      <div>
+        <strong>桌面版 · Windows 10 / 11 · 64 位</strong>
+        <span>Nightwalk-1.0.0-win64.zip &nbsp;·&nbsp; 110 MB（解压后 268 MB）&nbsp;·&nbsp; 免安装</span>
+      </div>
+      <div class='cta'>
+        <a class='btn ghost' href='download/Nightwalk-1.0.0-win64.zip.001' download>第 一 卷</a>
+      </div>
+    </div>
+    <p class='sub' style='margin:26px 0 8px'>压缩包按 20 MB 分成了六卷，任何静态托管都能放（单文件上限 25 MB 也吃得下）。六个文件全部下载到同一个文件夹，然后：</p>
+    <ul class='parts'>
+      <li><code>Nightwalk-1.0.0-win64.zip.001</code> <i>20.0 MB</i></li>
+      <li><code>Nightwalk-1.0.0-win64.zip.002</code> <i>20.0 MB</i></li>
+      <li><code>Nightwalk-1.0.0-win64.zip.003</code> <i>20.0 MB</i></li>
+      <li><code>Nightwalk-1.0.0-win64.zip.004</code> <i>20.0 MB</i></li>
+      <li><code>Nightwalk-1.0.0-win64.zip.005</code> <i>20.0 MB</i></li>
+      <li><code>Nightwalk-1.0.0-win64.zip.006</code> <i>9.8 MB</i></li>
+    </ul>
+    <ol class='steps'>
+      <li>把六卷放在同一个文件夹里（文件名不要改）。</li>
+      <li>双击同目录的 <code>合并分卷.bat</code>，会拼出 <code>Nightwalk-1.0.0-win64.zip</code>；或者在命令行里执行 <code>copy /b *.zip.00* Nightwalk-1.0.0-win64.zip</code>。</li>
+      <li>解压，得到 <code>Nightwalk-1.0.0-win64</code> 文件夹（不要只拷 exe 出来），双击里面的 <code>启动夜归.bat</code>。</li>
+      <li>直接双击 <code>夜归.exe</code> 可能会一闪就退（部分机器拦 Chromium 沙箱），用 bat 启动即可。</li>
+    </ol>
+  </section>
+
+  <section class='sec reveal' id='faq'>
+    <h2>常见问题</h2>
+    <details><summary>双击 夜归.exe 窗口一闪就没了</summary><p>这台机器拦了 Chromium 的沙箱进程。用同目录的 <code>启动夜归.bat</code> 启动，它会带上 <code>--no-sandbox</code>。游戏只加载本地文件，不访问网络。</p></details>
+    <details><summary>存档在哪里</summary><p><code>%APPDATA%\夜归</code>。设置和进度都在里面，删掉等于重来。主界面「重新开始」也会清档。</p></details>
+    <details><summary>为什么一开始没有声音</summary><p>浏览器和 Electron 都要求先有一次点击才允许播放音频。点一下画面就好；音量在 ESC → 设置里调。</p></details>
+    <details><summary>主界面写着「不是你的」</summary><p>那是存档污染机制，不是错误。走远一点（超过 600 像素）再回主界面，它就会变回你自己的进度。</p></details>
+    <details><summary>能窗口化吗 / 能改字号吗</summary><p>默认 1320×820 窗口，F11 全屏。ESC → 设置里可以调音量、静音、字幕字号、减少闪烁。</p></details>
+  </section>
+
+  <section class='sec reveal contact' id='contact'>
+    <h2>不失联</h2>
+    <p class='sub'>这个站点只有三个文件：一个 HTML、一个 CSS、几张截图。没有后端，没有 CDN，没有统计脚本，没有要加载的字体。断网、换机器、几年后再打开，它还是这个样子。</p>
+    <p class='sub'>写点什么：<a href='mailto:yg@nightwalk.example'>yg@nightwalk.example</a>（把这一行换成你自己的邮箱就能用）</p>
+  </section>
+
+</main>
+
+<footer class='wrap'>
+  <span>夜归 · NIGHTWALK · 1.0.0</span>
+  <span>CANVAS 2D + WEBAUDIO · 无引擎 · 无素材 · 零依赖 &nbsp;·&nbsp; <a href='play/'>在线版</a></span>
+</footer>
+
+<script src='main.js'></script>
+</body>
+</html>
