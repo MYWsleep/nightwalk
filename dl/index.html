@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高速下载 · 夜归 Nightwalk</title>
+<meta name="description" content="夜归 Nightwalk 安装程序高速下载通道：分卷直连、并行下载、镜像测速。">
+<link rel="stylesheet" href="../style.css">
+<style>
+  body{padding-bottom:0}
+  .dlwrap{padding:120px 0 80px}
+  .dlwrap h1{font-size:clamp(44px,8vw,86px);line-height:1;margin:0 0 10px}
+  .dlwrap .kicker{margin-bottom:18px}
+  .box2{border:1px solid var(--line);background:radial-gradient(120% 160% at 0% 0%,rgba(163,36,27,.14),transparent 60%),#0a0c10;padding:30px 32px}
+  .big{width:100%;justify-content:center;font-size:15px;letter-spacing:.24em;padding:18px 26px}
+  .big[disabled]{opacity:.55;cursor:default;transform:none}
+  .bar{height:8px;background:rgba(217,210,198,.10);margin:22px 0 12px;overflow:hidden;border:1px solid rgba(217,210,198,.10)}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#a3241b,#c9432f);transition:width .18s linear}
+  .stat{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;letter-spacing:.1em;color:var(--dim);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .stat b{color:#efe7da;font-weight:500}
+  .hash{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#6d675e;word-break:break-all;margin-top:16px;line-height:1.7}
+  .hash em{color:#a3241b;font-style:normal}
+  .mlist{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:8px}
+  .mlist li{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid rgba(217,210,198,.1);padding:12px 14px;background:#080a0d;flex-wrap:wrap}
+  .mlist .n{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.14em;color:#ded7ca}
+  .mlist .s{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--dim)}
+  .mlist .s.fast{color:#8fd2a0}
+  .mlist .s.best{color:#a3241b}
+  .mlist a{text-decoration:none}
+  .mlist .btn{padding:8px 16px;font-size:12px}
+  h2.sm{font-size:22px;margin:44px 0 6px}
+  .note{color:var(--dim);font-size:13.5px;margin:8px 0 0}
+  .parts{grid-template-columns:repeat(4,1fr)}
+  @media (max-width:900px){.parts{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:620px){.parts{grid-template-columns:1fr}.dlwrap{padding:96px 0 60px}.box2{padding:22px}}
+</style>
+</head>
+<body>
+<div class="topnav">
+  <a class="brand glitch" data-t href="../">夜 归</a>
+  <div class="navlinks"><a href="../">回到首页</a><a href="../play/">在线试玩</a><a href="../#download">下载说明</a></div>
+</div>
+
+<main class="wrap dlwrap">
+  <p class="kicker">FAST CHANNEL · 分卷直连 · 并行下载</p>
+  <h1>高 速 下 载</h1>
+  <p class="lead">安装程序被切成 12 卷放在这台站点的 CDN 上，浏览器并行拉取后自动拼回完整的 <code>Nightwalk-Setup-1.0.1.exe</code>。不经过 GitHub，不用手动合并。</p>
+
+  <div class="box2" style="margin-top:36px">
+    <button class="btn solid big" id="go">开 始 高 速 下 载</button>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="stat"><span id="l">共 12 卷 · 110.0 MB</span><span id="r">等待开始</span></div>
+    <div class="hash">SHA256 <em>e14ffc79570b21553cb0e4417fbd6808936b5952e70993fc3697f72ac0cd9ead</em></div>
+  </div>
+
+  <h2 class="sm">备用通道</h2>
+  <p class="note">高速通道不可用时按顺序试；点「测 速」会用 1 MB 分片实测每条通道，最慢的会被标出来。</p>
+  <ul class="mlist" id="mlist">
+    <li data-k="direct"><span class="n">GitHub 直连</span><span class="s">未测</span><a class="btn ghost" href="https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe">下 载</a></li>
+    <li data-k="ghfast"><span class="n">ghfast.top 镜像</span><span class="s">未测</span><a class="btn ghost" href="https://ghfast.top/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe">下 载</a></li>
+    <li data-k="ghproxy"><span class="n">gh-proxy.com 镜像</span><span class="s">未测</span><a class="btn ghost" href="https://gh-proxy.com/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe">下 载</a></li>
+    <li data-k="zip"><span class="n">便携版 zip</span><span class="s">110 MB</span><a class="btn ghost" href="https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip">下 载</a></li>
+  </ul>
+  <div style="margin-top:14px"><button class="btn ghost" id="bench">测 速</button></div>
+
+  <h2 class="sm">手动分卷</h2>
+  <p class="note">不喜欢用浏览器拼包，就逐卷下载后双击 <a href="parts/合并分卷.bat" style="color:#efd7c9">合并分卷.bat</a>，会得到同一个文件。</p>
+  <ul class="parts" id="plist"></ul>
+
+  <footer style="margin-top:56px"><span>夜 归 · NIGHTWALK · 1.0.1</span><span>64 BIT · WINDOWS</span></footer>
+</main>
+
+<script>
+(function(){
+  var TOTAL=115364864, NPARTS=12, PB=10485760, SHA='e14ffc79570b21553cb0e4417fbd6808936b5952e70993fc3697f72ac0cd9ead';
+  var elGo=document.getElementById('go'), elFill=document.getElementById('fill'),
+      elL=document.getElementById('l'), elR=document.getElementById('r'), elP=document.getElementById('plist');
+  function partName(i){ return 'parts/nw-setup.part' + ('0'+i).slice(-2); }
+  function mb(b){ return (b/1048576).toFixed(1); }
+  // 分卷列表
+  var html='';
+  for (var i=0;i<NPARTS;i++){ var sz = i===NPARTS-1 ? TOTAL-PB*(NPARTS-1) : PB;
+    html += '<li><a href="'+partName(i)+'" style="text-decoration:none">'+partName(i).replace('parts/','')+'</a><i>'+mb(sz)+' MB</i></li>'; }
+  elP.innerHTML = html;
+
+  var got=0, t0=0, done=false, raf=0;
+  function paint(){
+    var pc = Math.min(100, got/TOTAL*100);
+    elFill.style.width = pc.toFixed(1)+'%';
+    var dt = (performance.now()-t0)/1000 || 1, sp = got/dt;
+    elL.textContent = '已下载 ' + mb(got) + ' / 110.0 MB（' + pc.toFixed(0) + '%）';
+    elR.textContent = sp>1048576 ? (sp/1048576).toFixed(1)+' MB/s' : (sp/1024).toFixed(0)+' KB/s';
+    if (got>0 && !done){ var left=(TOTAL-got)/Math.max(1,sp); elR.textContent += ' · 剩余 ' + (left>60?Math.round(left/60)+' 分'+(Math.round(left)%60)+' 秒':Math.round(left)+' 秒'); }
+  }
+  function tick(){ if(done) return; paint(); raf=requestAnimationFrame(tick); }
+
+  async function grab(i, on){
+    var r = await fetch(partName(i), {cache:'no-store'});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    var rd = r.body.getReader(), chunks=[], n=0;
+    for(;;){ var s = await rd.read(); if (s.done) break; chunks.push(s.value); n += s.value.length; on(s.value.length); }
+    var out = new Uint8Array(n), o=0;
+    for (var k=0;k<chunks.length;k++){ out.set(chunks[k], o); o += chunks[k].length; }
+    return out;
+  }
+
+  async function run(opt){
+    opt = opt || {};
+    var bufs = new Array(NPARTS), cursor = 0, errs = [];
+    got = 0; t0 = performance.now(); done = false;
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    async function worker(){
+      for(;;){
+        var i = cursor++; if (i >= NPARTS) return;
+        try { bufs[i] = await grab(i, function(n){ got += n; }); }
+        catch(e){ errs.push(i+':'+e.message); }
+      }
+    }
+    await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
+    done = true; cancelAnimationFrame(raf); paint();
+    if (errs.length) return {ok:false, errs:errs};
+    var blob = new Blob(bufs, {type:'application/octet-stream'});
+    var ab = await blob.arrayBuffer();
+    var dg = await crypto.subtle.digest('SHA-256', ab);
+    var hex = Array.prototype.map.call(new Uint8Array(dg), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+    var res = {ok:true, bytes:blob.size, sha:hex, match:hex===SHA, ms:Math.round(performance.now()-t0)};
+    if (opt.save === false) return res;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'Nightwalk-Setup-1.0.1.exe';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 60000);
+    return res;
+  }
+
+  elGo.addEventListener('click', async function(){
+    elGo.disabled = true; elGo.textContent = '正 在 下 载 …'; elR.textContent = '准备中';
+    try {
+      var r = await run({save:true});
+      if (!r.ok){ elR.textContent = '有分卷失败，请用备用通道'; elGo.textContent = '重 试'; }
+      else { elR.textContent = r.ms/1000 + ' 秒 · ' + (r.bytes/1048576/ (r.ms/1000)).toFixed(1) + ' MB/s · 校验' + (r.match?'通过':'不符'); elGo.textContent = '已 保 存'; }
+    } catch(e){ elR.textContent = '失败：' + e.message; elGo.textContent = '重 试'; }
+    elGo.disabled = false;
+  });
+
+  // 镜像测速：1 MB range
+  var MIRRORS = {
+    direct: 'https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
+    ghfast: 'https://ghfast.top/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
+    ghproxy: 'https://gh-proxy.com/https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe',
+    zip: 'https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip'
+  };
+  async function bench(k){
+    var li = document.querySelector('#mlist li[data-k="'+k+'"] .s');
+    li.textContent = '测试中'; li.className = 's';
+    var t = performance.now(), bytes = 0;
+    try {
+      var ac = new AbortController(); var tm = setTimeout(function(){ ac.abort(); }, 15000);
+      var r = await fetch(MIRRORS[k], {headers:{Range:'bytes=0-1048575'}, signal:ac.signal, cache:'no-store'});
+      clearTimeout(tm);
+      if (!r.body){ li.textContent = '不支持流式'; return 0; }
+      var rd = r.body.getReader();
+      for(;;){ var s = await rd.read(); if (s.done) break; bytes += s.value.length; }
+    } catch(e){ li.textContent = '不通'; return 0; }
+    var sec = (performance.now()-t)/1000, sp = bytes/sec;
+    var txt = sp>1048576 ? (sp/1048576).toFixed(1)+' MB/s' : (sp/1024).toFixed(0)+' KB/s';
+    li.textContent = txt; li.className = 's' + (sp>262144 ? ' fast' : '');
+    return sp;
+  }
+  document.getElementById('bench').addEventListener('click', async function(){
+    var out = {};
+    await Promise.all(Object.keys(MIRRORS).map(async function(k){ out[k] = await bench(k); }));
+    var best = Object.keys(out).sort(function(a,b){ return out[b]-out[a]; })[0];
+    var li = document.querySelector('#mlist li[data-k="'+best+'"] .s');
+    if (li && out[best] > 0){ li.className = 's best'; li.textContent += ' · 最快'; }
+  });
+
+  window.__dl = {run:run, MIRRORS:MIRRORS, TOTAL:TOTAL, NPARTS:NPARTS};
+})();
+</script>
+</body>
+</html>
