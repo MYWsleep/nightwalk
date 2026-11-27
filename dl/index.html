@@ -83,7 +83,7 @@
     html += '<li><a href="'+partName(i)+'" style="text-decoration:none">'+partName(i).replace('parts/','')+'</a><i>'+mb(sz)+' MB</i></li>'; }
   elP.innerHTML = html;
 
-  var got=0, t0=0, done=false, raf=0, WORKERS=16, CHUNK=2097152;
+  var got=0, t0=0, done=false, raf=0, WORKERS=16, CHUNK=1048576;
   function paint(){
     var pc = Math.min(100, got/TOTAL*100);
     elFill.style.width = pc.toFixed(1)+'%';
@@ -95,32 +95,50 @@
   function tick(){ if(done) return; paint(); raf=requestAnimationFrame(tick); }
 
   // 分卷 + Range：把整包当成一段连续字节，切 2 MB 一片，任意并发
-  async function grabChunk(start, len, tries){
+  async function grabChunk(start, len, onBytes){
     var end = start + len - 1;
     var pidx = Math.floor(start / PB), lo = start - pidx*PB, hi = Math.min(PB-1, lo + len - 1);
     var r = await fetch(partName(pidx), {cache:'no-store', headers:{Range:'bytes='+lo+'-'+hi}});
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    if (r.status === 206){ return new Uint8Array(await r.arrayBuffer()); }
-    // 服务器忽略 Range 时返回整卷：切出来
-    var full = new Uint8Array(await r.arrayBuffer());
-    return full.subarray(lo, hi+1);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    if (!r.body || r.status !== 206){                 // 服务器忽略 Range：返回整卷后切片
+      var full = new Uint8Array(await r.arrayBuffer());
+      var sl = (r.status === 206) ? full : full.subarray(lo, hi+1);
+      onBytes(sl.length); return sl;
+    }
+    var rd = r.body.getReader(), parts = [], n = 0;
+    for(;;){ var st = await rd.read(); if (st.done) break; parts.push(st.value); n += st.value.length; onBytes(st.value.length); }
+    var out = new Uint8Array(n), o = 0;
+    for (var k = 0; k < parts.length; k++){ out.set(parts[k], o); o += parts[k].length; }
+    return out;
+  }
+
+  function plan(C){                                  // 每片都不能跨卷（跨卷会被 Range 截断）
+    var list = [];
+    for (var p = 0; p < NPARTS; p++){
+      var psize = (p === NPARTS-1) ? (TOTAL - PB*(NPARTS-1)) : PB;
+      for (var o = 0; o < psize; o += C) list.push([p*PB + o, Math.min(C, psize - o)]);
+    }
+    return list;
   }
 
   async function run(opt){
     opt = opt || {};
     var W = opt.workers || WORKERS, C = opt.chunk || CHUNK;
-    var nChunks = Math.ceil(TOTAL / C);
-    var out = new Uint8Array(TOTAL), cursor = 0, errs = [], fails = {};
+    var todo = plan(C), nChunks = todo.length;
+    var out = new Uint8Array(TOTAL), cursor = 0, errs = [];
     got = 0; t0 = performance.now(); done = false;
     cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     async function worker(){
       for(;;){
         var i = cursor++; if (i >= nChunks) return;
-        var start = i*C, len = Math.min(C, TOTAL - start);
-        var ok = false;
+        var start = todo[i][0], len = todo[i][1], ok = false;
         for (var t = 0; t < 2 && !ok; t++){
-          try { var buf = await grabChunk(start, len, t); out.set(buf, start); got += buf.length; ok = true; }
-          catch(e){ if (t === 1) errs.push(i + ':' + e.message); }
+          var mine = 0;
+          try {
+            var buf = await grabChunk(start, len, function(n){ mine += n; got += n; });
+            if (buf.length !== len) throw new Error('short ' + buf.length + '/' + len);
+            out.set(buf, start); ok = true;
+          } catch(e){ got -= mine; if (t === 1) errs.push(i + ':' + e.message); }
         }
       }
     }
@@ -129,14 +147,14 @@
     done = true; cancelAnimationFrame(raf); paint();
     if (errs.length) return {ok:false, errs:errs.slice(0,5), workers:W};
     var dg = await crypto.subtle.digest('SHA-256', out);
-    var hex = Array.prototype.map.call(new Uint8Array(dg), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
-    var res = {ok:true, bytes:out.length, sha:hex, match:hex===SHA, ms:Math.round(performance.now()-t0), workers:W};
+    var hex = Array.prototype.map.call(new Uint8Array(dg), function(b2){ return ('0'+b2.toString(16)).slice(-2); }).join('');
+    var res = {ok:true, bytes:out.length, sha:hex, match:hex===SHA, ms:Math.round(performance.now()-t0), workers:W, chunks:nChunks};
     if (opt.save === false) return res;
     var blob = new Blob([out], {type:'application/octet-stream'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'Nightwalk-Setup-1.0.1.exe';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 60000);
+    var a2 = document.createElement('a');
+    a2.href = URL.createObjectURL(blob); a2.download = 'Nightwalk-Setup-1.0.1.exe';
+    document.body.appendChild(a2); a2.click(); a2.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a2.href); }, 60000);
     return res;
   }
 
