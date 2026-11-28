@@ -6,7 +6,7 @@
 - **官网**：https://mywsleep.github.io/nightwalk/
 - **桌面版（安装程序）**：[Nightwalk-Setup-1.0.1.exe](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-Setup-1.0.1.exe)（110 MB，双击安装）
 - **桌面版（便携）**：[Nightwalk-1.0.1-win64.zip](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-win64.zip)（110 MB，解压后跑 启动夜归.bat）
-- **安卓版（APK）**：[Nightwalk-1.0.0-android.apk](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.0-android.apk)（426 KB，Android 5.0+，触屏操作）
+- **安卓版（APK）**：[Nightwalk-1.0.1-android.apk](https://github.com/MYWsleep/nightwalk/releases/download/v1.0.1/Nightwalk-1.0.1-android.apk)（426 KB，Android 5.0+，触屏操作）
 
 ## 内容
 
